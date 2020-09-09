@@ -2,9 +2,10 @@ window.addEventListener('DOMContentLoaded', (e) => {
 
     fetch('/kitten/image')
         .then(res => {
-            console.log(res);
+            // console.log(res);
             if (!res.ok) {
-                throw Error(res);
+                // console.log(new Error(res));
+                throw res
             }
             return res.json();
         })
@@ -14,7 +15,12 @@ window.addEventListener('DOMContentLoaded', (e) => {
             pic.src = data.src
         })
         .catch(err => {
-            document.querySelector('.error').innerHTML = "Something went wrong! Please try again."
+            err.json()
+                .then(data => {
+                    // console.log(data)
+                    document.querySelector('.error').innerHTML = data.message;
+                })
+            // console.log(err);
             // alert("Something went wrong! Please try again.")
         });
 
@@ -26,7 +32,7 @@ window.addEventListener('DOMContentLoaded', (e) => {
             fetch('/kitten/image')
                 .then(res => {
                     if (!res.ok) {
-                        throw Error(res);
+                        throw res;
                     }
                     return res.json();
                 })
@@ -37,7 +43,11 @@ window.addEventListener('DOMContentLoaded', (e) => {
                     document.querySelector('.loader').innerHTML = ''
                 })
                 .catch(err => {
-                    document.querySelector('.error').innerHTML = "Something went wrong! Please try again."
+                    err.json()
+                        .then(data => {
+                            document.querySelector('.error').innerHTML = data.message;
+                        })
+                    // document.querySelector('.error').innerHTML = "Something went wrong! Please try again."
                     // alert("Something went wrong! Please try again.")
                 });
         })
@@ -85,7 +95,7 @@ window.addEventListener('DOMContentLoaded', (e) => {
         fetch('/kitten/comments', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({"comment": userComment.value})
+            body: JSON.stringify({ "comment": userComment.value })
         })
             .then(res => {
                 if (!res.ok) {
@@ -95,7 +105,36 @@ window.addEventListener('DOMContentLoaded', (e) => {
 
             })
             .then(data => {
-                console.log(data)
+                let commentsDiv = document.querySelector(".comments");
+                // console.log(data);
+                // console.log(commentsDiv)
+                finalString = '';
+                data.comments.forEach(el => {
+                    finalString += `<div>${el} <button class="delete">DELETE</button> </div>`
+                    // finalString += `<ul id=${el}>${el}</ul> <button class='delete' id='${el}>DELETE</button>`;
+                })
+                // console.log(finalString)
+                commentsDiv.innerHTML = finalString;
+
+                let nodeList = document.querySelectorAll('.delete')
+                nodeList.forEach(el =>{
+                    el.addEventListener("click", e => {
+                        // console.log(e.target.parentNode)
+                        let removed = e.target.parentNode
+
+                        // let removedText = removed.innerText;
+                        // // console.log(removedText)
+                        // let searchText = removedText.slice(0, removedText.length - 7)
+                        // // console.log(searchText)
+                        // for(let i = 0; i < data.comments.length; i++){
+                        //     if(data.comments[i] === searchText){
+                        //         data.comments.splice(i)
+                        //     }
+                        // }
+                        // console.log(data.comments)
+                        removed.remove();
+                    })
+                })
 
 
             })
@@ -105,4 +144,5 @@ window.addEventListener('DOMContentLoaded', (e) => {
 
 
     })
+
 })

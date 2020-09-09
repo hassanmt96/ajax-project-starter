@@ -56,7 +56,10 @@ app.get("/kitten/image", (req, res) => {
         res.json(kitten);
       });
   } catch (e) {
+    // console.log(e.message)
+    // res.statusMessage = e.message
     res.status(503).send({ message: e.message });
+    // console.log(e)
   }
 });
 
